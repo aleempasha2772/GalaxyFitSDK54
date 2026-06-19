@@ -31,6 +31,7 @@ export default function RootLayout() {
       <Stack.Screen name="second" options={{ title: 'Second Screen' }} />
       <Stack.Screen name="workouts" options={{ headerShown: false }} />
       <Stack.Screen name="live-workout" options={{ headerShown: false }} />
+      <Stack.Screen name="muscle-select" options={{ headerShown: false }} />
     </Stack>
   );
 }

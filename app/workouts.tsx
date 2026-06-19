@@ -63,7 +63,10 @@ export default function WorkoutsScreen() {
         <View style={styles.grid}>
           <ExerciseCard icon="directions-walk" title="Walking" subtitle="Avg 110 BPM" />
           <ExerciseCard icon="directions-run" title="Running" subtitle="Avg 165 BPM" />
-          <ExerciseCard icon="fitness-center" title="Weight Training" subtitle="Hypertrophy" />
+          <ExerciseCard icon="fitness-center" title="Weight Training" subtitle="Hypertrophy" onPress={() => {
+            console.log('Weight Training card clicked');
+            router.push('/muscle-select');
+          }} />
           <ExerciseCard icon="directions-bike" title="Cycling" subtitle="Endurance" />
           <ExerciseCard icon="pool" title="Swimming" subtitle="Full Body" />
           <ExerciseCard icon="self-improvement" title="Yoga" subtitle="Mobility" />
@@ -88,9 +91,9 @@ export default function WorkoutsScreen() {
 
 // ---------- Sub-components ----------
 
-function ExerciseCard({ icon, title, subtitle }: { icon: string; title: string; subtitle: string }) {
+function ExerciseCard({ icon, title, subtitle,onPress }: { icon: string; title: string; subtitle: string ; onPress?: () => void }) {
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.cardGlow} />
       <MaterialIcons name={icon as any} size={30} color="#6effc0" style={styles.cardIcon} />
       <Text style={styles.cardTitle}>{title}</Text>
@@ -112,6 +115,8 @@ function NavItem({ icon, label, onPress, active = false }: { icon: string; label
     </TouchableOpacity>
   );
 }
+
+
 
 // ---------- Styles ----------
 const styles = StyleSheet.create({
