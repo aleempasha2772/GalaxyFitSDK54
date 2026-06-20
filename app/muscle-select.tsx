@@ -39,6 +39,7 @@ export default function MuscleSelectScreen() {
   const handleSelect = (id: string) => {
     setSelected(id);
     // Future: navigate to exercise list or start workout
+    router.push({ pathname: '/record-session', params: { muscle: id } });
   };
 
   return (
