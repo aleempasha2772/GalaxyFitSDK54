@@ -9,8 +9,10 @@ import {
   Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import Svg, { Path, Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
+import { COLORS } from '../src/constants/theme';
 
 export default function LiveWorkoutScreen() {
   const router = useRouter();
@@ -38,7 +40,7 @@ export default function LiveWorkoutScreen() {
   const effortScore = 67;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
@@ -202,14 +204,14 @@ export default function LiveWorkoutScreen() {
           <MaterialIcons name="edit" size={18} color="#84958a" />
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',

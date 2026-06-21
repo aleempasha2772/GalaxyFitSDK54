@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { checkPermissions, requestAllPermissions } from '../src/services/HealthPermissionsService';
+import { COLORS } from '../src/constants/theme';
 
 export default function HealthPermissionsScreen() {
   const router = useRouter();
@@ -48,24 +50,24 @@ export default function HealthPermissionsScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Health Connect Setup</Text>
       <Text style={styles.description}>
         To show your fitness data from Galaxy Fit3, we need access to:
       </Text>
       <View style={styles.bullets}>
-        <Text>• Steps & Distance</Text>
-        <Text>• Heart Rate</Text>
-        <Text>• Sleep</Text>
-        <Text>• Blood Oxygen</Text>
-        <Text>• Calories Burned</Text>
+        <Text style={styles.bullet}>• Steps & Distance</Text>
+        <Text style={styles.bullet}>• Heart Rate</Text>
+        <Text style={styles.bullet}>• Sleep</Text>
+        <Text style={styles.bullet}>• Blood Oxygen</Text>
+        <Text style={styles.bullet}>• Calories Burned</Text>
       </View>
 
       {granted ? (
@@ -74,23 +76,24 @@ export default function HealthPermissionsScreen() {
           <Button title="Go to Dashboard" onPress={() => router.replace('/dashboard')} />
         </>
       ) : (
-        <Button 
-          title="Grant Permissions" 
+        <Button
+          title="Grant Permissions"
           onPress={() => {
             console.log('[PermissionsScreen] Button pressed');
             handleRequest();
-          }} 
+          }}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 30, justifyContent: 'center' },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 15 },
-  description: { fontSize: 16, marginBottom: 15, color: '#555' },
+  container: { flex: 1, padding: 30, justifyContent: 'center', backgroundColor: COLORS.background },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 15, color: '#F2F2FF' },
+  description: { fontSize: 16, marginBottom: 15, color: '#84958a' },
   bullets: { marginBottom: 25 },
-  granted: { fontSize: 18, color: 'green', marginBottom: 15 },
+  bullet: { fontSize: 16, color: '#dbe5dd', marginBottom: 4 },
+  granted: { fontSize: 18, color: '#6effc0', marginBottom: 15 },
 });

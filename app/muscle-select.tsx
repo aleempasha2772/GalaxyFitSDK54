@@ -9,7 +9,9 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { COLORS } from '../src/constants/theme';
 
 const { width } = Dimensions.get('window');
 const CARD_GAP = 12;
@@ -43,7 +45,7 @@ export default function MuscleSelectScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header is handled by Stack Navigator */}
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Section Header */}
@@ -107,14 +109,14 @@ export default function MuscleSelectScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0d1511', // surface-dim
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
     paddingHorizontal: 20,

@@ -9,7 +9,9 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import { COLORS } from '../src/constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -110,7 +112,7 @@ export default function RecordSessionScreen() {
 
   // ---------- UI ----------
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Top Bar */}
       <View style={styles.topBar}>
         <View style={styles.topLeft}>
@@ -200,14 +202,14 @@ export default function RecordSessionScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: COLORS.background,
   },
   topBar: {
     flexDirection: 'row',

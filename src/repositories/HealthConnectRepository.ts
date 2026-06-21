@@ -1,43 +1,99 @@
-import { readRecords } from 'react-native-health-connect';
+// repositories/HealthConnectRepository.ts
 
-// ---------- Today aggregators ----------
-async function readToday(recordType: string, aggregate: (records: any[]) => number): Promise<number | null> {
+import { readRecords, aggregateRecord } from 'react-native-health-connect';
+
+/** Matches "Aleem's A35, Samsung Health" in the Health Connect app */
+const SAMSUNG_HEALTH_ORIGIN = 'com.sec.android.app.shealth';
+
+function getTodayTimeRange() {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return {
+    operator: 'between' as const,
+    startTime: start.toISOString(),
+    endTime: now.toISOString(),
+  };
+}
+
+async function aggregateToday(
+  recordType: string,
+  extract: (result: any) => number | null,
+  dataOriginFilter?: string[]
+): Promise<number | null> {
   try {
-    const result = await readRecords(recordType as any, {
-      timeRangeFilter: { operator: 'between', startTime: start.toISOString(), endTime: now.toISOString() },
+    const result = await aggregateRecord({
+      recordType: recordType as any,
+      timeRangeFilter: getTodayTimeRange(),
+      ...(dataOriginFilter ? { dataOriginFilter } : {}),
     });
-    if (result.records.length === 0) return null;
-    return aggregate(result.records);
+    if (!result) return null;
+    return extract(result);
   } catch (error) {
-    console.error(`[HealthConnectRepo] Failed to read ${recordType}:`, error);
+    console.error(`[HealthConnectRepo] Failed to aggregate ${recordType}:`, error);
     return null;
   }
 }
 
-export const readTodaySteps = () =>
-  readToday('Steps', recs => recs.reduce((s: number, r: any) => s + r.count, 0));
+/**
+ * Samsung Health only — matches the Health Connect "Entries" screen total.
+ *
+ * We sum raw records instead of using aggregateRecord(COUNT_TOTAL) on purpose:
+ * aggregateRecord de-duplicates overlapping step intervals, which makes the
+ * number LOWER than what Health Connect / Samsung Health display (e.g. 7,514
+ * instead of 8,104). The Entries screen shows a plain sum, so we do the same.
+ */
+export async function readTodaySteps(): Promise<number | null> {
+  try {
+    const result = await readRecords('Steps', {
+      timeRangeFilter: getTodayTimeRange(),
+      dataOriginFilter: [SAMSUNG_HEALTH_ORIGIN],
+    });
+    if (result.records.length === 0) return null;
+    return result.records.reduce((sum, r: any) => sum + r.count, 0);
+  } catch (error) {
+    console.error('[HealthConnectRepo] Failed to read steps:', error);
+    return null;
+  }
+}
 
 export const readTodayDistance = () =>
-  readToday('Distance', recs => recs.reduce((s: number, r: any) => s + r.distance.inMeters, 0));
+  aggregateToday(
+    'Distance',
+    (res) => res?.DISTANCE?.inMeters ?? null,
+    [SAMSUNG_HEALTH_ORIGIN]
+  );
 
 export const readTodayFloorsClimbed = () =>
-  readToday('FloorsClimbed', recs => recs.reduce((s: number, r: any) => s + r.floors, 0));
+  aggregateToday(
+    'FloorsClimbed',
+    (res) => res?.FLOORS_CLIMBED_TOTAL ?? null,
+    [SAMSUNG_HEALTH_ORIGIN]
+  );
 
+/** Basal + active calories often come from system origins, not Samsung */
 export const readTodayTotalCalories = () =>
-  readToday('TotalCaloriesBurned', recs => recs.reduce((s: number, r: any) => s + r.energy.inKilocalories, 0));
+  aggregateToday('TotalCaloriesBurned', (res) => res?.ENERGY_TOTAL?.inKilocalories ?? null);
 
 export const readTodayActiveCalories = () =>
-  readToday('ActiveCaloriesBurned', recs => recs.reduce((s: number, r: any) => s + r.energy.inKilocalories, 0));
+  aggregateToday(
+    'ActiveCaloriesBurned',
+    (res) => res?.ACTIVE_CALORIES_TOTAL?.inKilocalories ?? null
+  );
 
-// ---------- Latest single‑value readers ----------
-async function readLatest<T>(recordType: string, extract: (record: any) => T | null): Promise<T | null> {
+async function readLatest<T>(
+  recordType: string,
+  extract: (record: any) => T | null,
+  lookbackDays = 7
+): Promise<T | null> {
   const now = new Date();
-  const start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const start = new Date(now.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
   try {
     const result = await readRecords(recordType as any, {
-      timeRangeFilter: { operator: 'between', startTime: start.toISOString(), endTime: now.toISOString() },
+      timeRangeFilter: {
+        operator: 'between',
+        startTime: start.toISOString(),
+        endTime: now.toISOString(),
+      },
       ascendingOrder: false,
       pageSize: 1,
     });
@@ -50,24 +106,24 @@ async function readLatest<T>(recordType: string, extract: (record: any) => T | n
 }
 
 export const readLastHeartRate = () =>
-  readLatest('HeartRate', (r: any) => r.samples?.[0]?.beatsPerMinute ?? null);
+  readLatest('HeartRate', (r) => r.samples?.[0]?.beatsPerMinute ?? null, 1);
 
 export const readLastRestingHeartRate = () =>
-  readLatest('RestingHeartRate', (r: any) => r.samples?.[0]?.beatsPerMinute ?? null);
+  readLatest('RestingHeartRate', (r) => r.samples?.[0]?.beatsPerMinute ?? null);
 
 export const readLastSpO2 = () =>
-  readLatest('OxygenSaturation', (r: any) => r.samples?.[0]?.percentage ?? null);
+  readLatest('OxygenSaturation', (r) => r.samples?.[0]?.percentage ?? null);
 
-export const readLastStress = () =>
-  readLatest('Stress', (r: any) => r.level ?? null);
-
-// ---------- Session readers ----------
 export async function readLastSleepSession(): Promise<any | null> {
   const now = new Date();
   const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   try {
     const result = await readRecords('SleepSession', {
-      timeRangeFilter: { operator: 'between', startTime: start.toISOString(), endTime: now.toISOString() },
+      timeRangeFilter: {
+        operator: 'between',
+        startTime: start.toISOString(),
+        endTime: now.toISOString(),
+      },
       ascendingOrder: false,
       pageSize: 1,
     });
@@ -83,7 +139,11 @@ export async function readLastExerciseSession(): Promise<any | null> {
   const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   try {
     const result = await readRecords('ExerciseSession', {
-      timeRangeFilter: { operator: 'between', startTime: start.toISOString(), endTime: now.toISOString() },
+      timeRangeFilter: {
+        operator: 'between',
+        startTime: start.toISOString(),
+        endTime: now.toISOString(),
+      },
       ascendingOrder: false,
       pageSize: 1,
     });

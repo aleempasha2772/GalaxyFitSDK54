@@ -1,6 +1,7 @@
 // app/dashboard.tsx
 import React, { useRef, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../src/constants/theme';
 
 import {
   View,
@@ -158,47 +159,9 @@ export default function DashboardScreen() {
           <MetricCard icon="directions-walk" value={activity.steps?.toLocaleString() ?? '--'} label="Steps" color="#6effc0" />
           <MetricCard icon="straighten" value={activity.distanceMeters ? `${(activity.distanceMeters / 1000).toFixed(1)} km` : '--'} label="Distance" color="#6effc0" />
           <MetricCard icon="favorite" value={heartRate.current ? `${heartRate.current}` : '--'} label="Heart Rate" color="#ffb4ab" unit=" bpm" />
-          <MetricCard icon="bed" value={heartRate.resting ? `${heartRate.resting}` : '--'} label="Resting HR" color="#ffb4ab" unit=" bpm" />
-          <MetricCard icon="whatshot" value={activity.totalCalories ? `${activity.totalCalories}` : '--'} label="Total kcal" color="#fcba59" />
+          <MetricCard icon="whatshot" value={activity.totalCalories != null ? `${Math.round(activity.totalCalories).toLocaleString()}` : '--'} label="Total kcal" color="#fcba59" />
           <MetricCard icon="hotel" value={sleepDuration} label="Sleep" color="#9B7EFF" />
-          <MetricCard icon="opacity" value={spo2 ? `${spo2}%` : '--'} label="SpO₂" color="#6effc0" />
           <MetricCard icon="fitness-center" value={lastExercise ? lastExercise.type : '--'} label="Last Workout" color="#a8c8ff" />
-        </View>
-
-        {/* WORKOUT CHIPS */}
-        <View style={styles.workoutCard}>
-          <View style={styles.workoutHeader}>
-            <Text style={styles.workoutTitle}>Start a session</Text>
-            <TouchableOpacity>
-              <MaterialIcons name="add-circle" size={20} color="#00E5A0" />
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-            <WorkoutChip icon="directions-walk" label="Walking" />
-            <WorkoutChip icon="directions-run" label="Running" />
-            <WorkoutChip icon="fitness-center" label="Weight Training" />
-            <WorkoutChip icon="pedal-bike" label="Cycling" />
-            <WorkoutChip icon="pool" label="Swimming" />
-          </ScrollView>
-        </View>
-
-        {/* RECENT INSIGHTS */}
-        <View style={styles.insightsSection}>
-          <View style={styles.insightsHeader}>
-            <Text style={styles.insightsTitle}>Recent Insights</Text>
-            <TouchableOpacity onPress={refresh}>
-              <MaterialIcons name="refresh" size={20} color="#00E5A0" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.insightCard}>
-            <View style={styles.insightIcon}>
-              <MaterialIcons name="lightbulb" size={20} color="#fcba59" />
-            </View>
-            <View style={styles.insightContent}>
-              <Text style={styles.insightLabel}>Optimal Sleep Window</Text>
-              <Text style={styles.insightDesc}>Aim for 10:30 PM tonight for peak recovery.</Text>
-            </View>
-          </View>
         </View>
       </ScrollView>
 
@@ -251,8 +214,8 @@ function NavItem({ icon, label, active = false, onPress }: { icon: string; label
 
 // ---------- Styles (identical to your working version) ----------
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0A0A0F' },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0A0A0F' },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
   topBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 20, paddingTop: 8, paddingBottom: 4,
@@ -265,7 +228,7 @@ const styles = StyleSheet.create({
   notifBtn: { padding: 8, borderRadius: 40, position: 'relative' },
   notifDot: {
     position: 'absolute', top: 10, right: 10, width: 8, height: 8,
-    borderRadius: 4, backgroundColor: '#6effc0', borderWidth: 2, borderColor: '#0A0A0F',
+    borderRadius: 4, backgroundColor: '#6effc0', borderWidth: 2, borderColor: COLORS.background,
   },
   statusRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 8, gap: 8 },
   pingContainer: { width: 12, height: 12, justifyContent: 'center', alignItems: 'center' },

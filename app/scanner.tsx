@@ -3,8 +3,10 @@ import {
   View, Text, Button, FlatList, StyleSheet, PermissionsAndroid,
   Platform, ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { BleManager, Device } from 'react-native-ble-plx';
 import { Buffer } from 'buffer';
+import { COLORS } from '../src/constants/theme';
 
 const manager = new BleManager();
 
@@ -110,7 +112,7 @@ export default function ScannerScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {connectedDevice && (
         <View style={styles.hrContainer}>
           <Text style={styles.hrLabel}>Connected: {connectedDevice.name}</Text>
@@ -152,23 +154,23 @@ export default function ScannerScreen() {
           </View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  container: { flex: 1, padding: 20, backgroundColor: COLORS.background },
   hrContainer: {
     backgroundColor: '#f0f8ff', padding: 15, borderRadius: 10, alignItems: 'center',
     marginBottom: 20, borderWidth: 1, borderColor: '#cce5ff',
   },
   hrLabel: { fontSize: 16, color: '#333' },
   hrValue: { fontSize: 40, fontWeight: 'bold', color: '#e74c3c', marginVertical: 5 },
-  title: { fontSize: 24, fontWeight: '600', marginBottom: 10 },
+  title: { fontSize: 24, fontWeight: '600', marginBottom: 10, color: '#F2F2FF' },
   deviceRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: '#eee',
+    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
   },
-  deviceName: { fontWeight: 'bold', fontSize: 16 },
-  deviceId: { color: '#888', fontSize: 12, marginTop: 2 },
+  deviceName: { fontWeight: 'bold', fontSize: 16, color: '#dbe5dd' },
+  deviceId: { color: '#84958a', fontSize: 12, marginTop: 2 },
 });

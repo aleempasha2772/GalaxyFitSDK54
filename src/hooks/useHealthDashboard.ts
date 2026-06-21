@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { AppState } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import { computeRecovery, fetchHealthSnapshot } from '../services/HealthDashboardService';
 import type { HealthSnapshot } from '../types/health';
 
@@ -27,6 +29,8 @@ export function useHealthDashboard(): UseHealthDashboardResult {
       console.log('[useHealthDashboard] Fetched At:', data.fetchedAt);
       console.log('[useHealthDashboard] Sleep data:', data.sleep);
       console.log('[useHealthDashboard] Sleep stages:', data.sleep?.stages);
+
+
       setSnapshot(data);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to load health data';
@@ -37,8 +41,20 @@ export function useHealthDashboard(): UseHealthDashboardResult {
     }
   }, []);
 
+  // Refetch whenever the screen regains focus (covers the initial mount focus too).
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh])
+  );
+
+  // Refetch when the app returns to the foreground (e.g. coming back from the
+  // Health Connect app), so the dashboard never shows a stale snapshot.
   useEffect(() => {
-    refresh();
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refresh();
+    });
+    return () => sub.remove();
   }, [refresh]);
 
   return { snapshot, loading, error, refresh };

@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import { COLORS } from '../src/constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -122,7 +123,7 @@ function NavItem({ icon, label, onPress, active = false }: { icon: string; label
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    backgroundColor: COLORS.background,
   },
   topBar: {
     flexDirection: 'row',

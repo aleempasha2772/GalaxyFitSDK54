@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, Button, StyleSheet, Linking, Platform } from 'react-native';
+import { Text, ActivityIndicator, Button, StyleSheet, Linking, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { checkPermissions } from '../services/HealthConnectService';
+import { COLORS } from '../src/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -29,16 +31,16 @@ export default function HomeScreen() {
 
   if (checking) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" />
-        <Text>Checking Health Connect...</Text>
-      </View>
+        <Text style={styles.statusText}>Checking Health Connect...</Text>
+      </SafeAreaView>
     );
   }
 
   if (!available) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <Text style={styles.errorTitle}>Health Connect Required</Text>
         <Text style={styles.errorMessage}>
           This app requires the Health Connect app. Please install it from the Play Store.
@@ -49,21 +51,22 @@ export default function HomeScreen() {
             Linking.openURL('https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata');
           }}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 
   // Fallback (normally the useEffect will redirect)
   return (
-    <View style={styles.centered}>
+    <SafeAreaView style={styles.centered}>
       <ActivityIndicator size="large" />
-      <Text>Preparing...</Text>
-    </View>
+      <Text style={styles.statusText}>Preparing...</Text>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  errorTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
-  errorMessage: { fontSize: 16, textAlign: 'center', marginBottom: 20, color: '#555' },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: COLORS.background },
+  statusText: { color: '#dbe5dd', marginTop: 12 },
+  errorTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, color: '#F2F2FF' },
+  errorMessage: { fontSize: 16, textAlign: 'center', marginBottom: 20, color: '#84958a' },
 });
