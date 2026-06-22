@@ -26,7 +26,12 @@ function mapSleep(raw: any): SleepData | null {
   if (!raw) return null;
   const start = new Date(raw.startTime);
   const end = new Date(raw.endTime);
-  const durationHours = Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 10) / 10;
+  // Prefer the summed asleep minutes from the repository (handles fragmented
+  // Samsung sessions); fall back to the envelope span for single sessions.
+  const durationHours =
+    raw.durationMinutes != null
+      ? Math.round((raw.durationMinutes / 60) * 10) / 10
+      : Math.round(((end.getTime() - start.getTime()) / 3_600_000) * 10) / 10;
 
   return {
     durationHours,

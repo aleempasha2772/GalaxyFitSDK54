@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../src/constants/theme';
+import BottomNavigation from '../src/components/BottomNavigation';
 
 const { width } = Dimensions.get('window');
 
@@ -43,23 +44,6 @@ export default function WorkoutsScreen() {
           </Text>
         </View>
 
-        {/* FILTER CHIPS */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsContainer}>
-          <View style={[styles.chip, styles.chipActive]}>
-            <MaterialIcons name="filter-list" size={14} color="#6effc0" />
-            <Text style={styles.chipTextActive}>All Types</Text>
-          </View>
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>Cardio</Text>
-          </View>
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>Strength</Text>
-          </View>
-          <View style={styles.chip}>
-            <Text style={styles.chipText}>Recovery</Text>
-          </View>
-        </ScrollView>
-
         {/* EXERCISE GRID */}
         <View style={styles.grid}>
           <ExerciseCard icon="directions-walk" title="Walking" subtitle="Avg 110 BPM" />
@@ -78,14 +62,7 @@ export default function WorkoutsScreen() {
         </View>
       </ScrollView>
 
-      {/* BOTTOM NAVIGATION (same as dashboard) */}
-      <View style={styles.bottomNav}>
-        <NavItem icon="home" label="Home" onPress={() => router.push('/dashboard')} />
-        <NavItem icon="fitness-center" label="Workouts" active />
-        <NavItem icon="bed" label="Sleep" onPress={() => {}} />
-        <NavItem icon="timer" label="Live" />
-        <NavItem icon="analytics" label="Summary" onPress={() => {}} />
-      </View>
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
@@ -102,22 +79,6 @@ function ExerciseCard({ icon, title, subtitle,onPress }: { icon: string; title: 
     </TouchableOpacity>
   );
 }
-
-function NavItem({ icon, label, onPress, active = false }: { icon: string; label: string; onPress?: () => void; active?: boolean }) {
-  return (
-    <TouchableOpacity style={styles.navItem} onPress={onPress}>
-      <MaterialIcons
-        name={icon as any}
-        size={24}
-        color={active ? '#6effc0' : '#84958a'}
-        style={active && styles.activeIcon}
-      />
-      <Text style={[styles.navLabel, active && styles.activeNavLabel]}>{label}</Text>
-    </TouchableOpacity>
-  );
-}
-
-
 
 // ---------- Styles ----------
 const styles = StyleSheet.create({
@@ -240,44 +201,5 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginTop: 2,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 24,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'rgba(20,20,32,0.8)',
-    borderRadius: 40,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.6,
-    shadowRadius: 16,
-    elevation: 20,
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  navLabel: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: '#84958a',
-    marginTop: 4,
-  },
-  activeNavLabel: {
-    color: '#6effc0',
-  },
-  activeIcon: {
-    textShadowColor: 'rgba(110,255,192,0.3)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
   },
 });

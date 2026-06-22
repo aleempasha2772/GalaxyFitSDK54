@@ -38,6 +38,7 @@ export default function RootLayout() {
       <Stack.Screen name="live-workout" options={{ headerShown: false }} />
       <Stack.Screen name="muscle-select" options={{ headerShown: false }} />
       <Stack.Screen name="record-session" options={{ headerShown: false }} />
+      <Stack.Screen name="sleep-analysis" options={{ headerShown: false }} />
     </Stack>
     </SafeAreaProvider>
   );

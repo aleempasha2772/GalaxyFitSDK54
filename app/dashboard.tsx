@@ -16,14 +16,15 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import BottomNavigation from '../src/components/BottomNavigation';
 import Svg, { Circle } from 'react-native-svg';
 import { useHealthDashboard } from '../src/hooks/useHealthDashboard';
 import { computeRecovery } from '../src/services/HealthDashboardService';
 
 const { width } = Dimensions.get('window');
-const CIRCUMFERENCE = 2 * Math.PI * 110;
+const RADIUS = 90;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const STROKE_WIDTH = 10;
-const RADIUS = 110;
 const SIZE = 256;
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -94,10 +95,6 @@ export default function DashboardScreen() {
           <TouchableOpacity style={styles.notifBtn} onPress={() => router.push('/scanner')}>
             <MaterialIcons name="bluetooth-searching" size={24} color="#6effc0" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.notifBtn}>
-            <MaterialIcons name="notifications" size={24} color="#dbe5dd" />
-            <View style={styles.notifDot} />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -162,17 +159,11 @@ export default function DashboardScreen() {
           <MetricCard icon="whatshot" value={activity.totalCalories != null ? `${Math.round(activity.totalCalories).toLocaleString()}` : '--'} label="Total kcal" color="#fcba59" />
           <MetricCard icon="hotel" value={sleepDuration} label="Sleep" color="#9B7EFF" />
           <MetricCard icon="fitness-center" value={lastExercise ? lastExercise.type : '--'} label="Last Workout" color="#a8c8ff" />
+          <MetricCard icon="opacity" value={spo2 ? `${spo2}%` : '--'} label="SpO₂" color="#6effc0" />
         </View>
       </ScrollView>
 
-      {/* BOTTOM NAVIGATION */}
-      <View style={styles.bottomNav}>
-        <NavItem icon="home" label="Home" active />
-        <NavItem icon="fitness-center" label="Workouts" onPress={() => router.push('/workouts')}/>
-        <NavItem icon="bed" label="Sleep" />
-        <NavItem icon="timer" label="Live" onPress={() => router.push('/live-workout')}/>
-        <NavItem icon="analytics" label="Summary" />
-      </View>
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
@@ -203,91 +194,74 @@ function WorkoutChip({ icon, label }: { icon: string; label: string }) {
   );
 }
 
-function NavItem({ icon, label, active = false, onPress }: { icon: string; label: string; active?: boolean; onPress?: () => void }) {
-  return (
-    <TouchableOpacity style={styles.navItem} onPress={onPress}>
-      <MaterialIcons name={icon as any} size={24} color={active ? '#6effc0' : '#84958a'} style={active && styles.activeIcon} />
-      <Text style={[styles.navLabel, active && styles.activeNavLabel]}>{label}</Text>
-    </TouchableOpacity>
-  );
-}
 
-// ---------- Styles (identical to your working version) ----------
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
   topBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, paddingTop: 8, paddingBottom: 4,
+    paddingHorizontal: 25,   // was 20
+    paddingTop: 15,          // was 10
+    paddingBottom: 11,       // was 6
     backgroundColor: 'rgba(10,10,15,0.8)',
   },
-  profileSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  profileImg: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  greeting: { color: '#dbe5dd', fontSize: 16, fontWeight: '500', letterSpacing: -0.3 },
+  profileSection: { flexDirection: 'row', alignItems: 'center', gap: 17 }, // gap +5
+  profileImg: { width: 47, height: 47, borderRadius: 23.5, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  greeting: { color: '#dbe5dd', fontSize: 23, fontWeight: '500', letterSpacing: -0.3 },
   headerActions: { flexDirection: 'row', alignItems: 'center' },
-  notifBtn: { padding: 8, borderRadius: 40, position: 'relative' },
+  notifBtn: { padding: 13, borderRadius: 40, position: 'relative' }, // was 8
   notifDot: {
-    position: 'absolute', top: 10, right: 10, width: 8, height: 8,
-    borderRadius: 4, backgroundColor: '#6effc0', borderWidth: 2, borderColor: COLORS.background,
+    position: 'absolute', top: 15, right: 15,     // was 10,10
+    width: 14, height: 14,                       // was 9
+    borderRadius: 7,                             // was 4.5
+    backgroundColor: '#6effc0', borderWidth: 2, borderColor: COLORS.background,
   },
-  statusRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 8, gap: 8 },
-  pingContainer: { width: 12, height: 12, justifyContent: 'center', alignItems: 'center' },
-  ping: { position: 'absolute', width: 12, height: 12, borderRadius: 6, backgroundColor: '#6effc0', opacity: 0.4 },
-  pingCore: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#6effc0' },
-  statusText: { color: '#84958a', fontSize: 11, fontWeight: '600', letterSpacing: 1.5, textTransform: 'uppercase' },
-  scrollContent: { paddingHorizontal: 20, paddingBottom: 120, gap: 24 },
-  readinessSection: { alignItems: 'center', paddingVertical: 24, minHeight: 335 },
-  gaugeContainer: { width: 256, height: 256, justifyContent: 'center', alignItems: 'center' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 6, gap: 6 },
+  pingContainer: { width: 10, height: 10, justifyContent: 'center', alignItems: 'center' },
+  ping: { position: 'absolute', width: 10, height: 10, borderRadius: 5, backgroundColor: '#6effc0', opacity: 0.4 },
+  pingCore: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#6effc0' },
+  statusText: { color: '#84958a', fontSize: 10, fontWeight: '600', letterSpacing: 1.5, textTransform: 'uppercase' },
+  scrollContent: { paddingHorizontal: 18, paddingBottom: 90, gap: 12 },
+  readinessSection: { alignItems: 'center', paddingVertical: 8, minHeight: 206 },
+  gaugeContainer: { width: 184, height: 184, justifyContent: 'center', alignItems: 'center' },
   readinessScore: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  scoreNumber: { fontSize: 72, lineHeight: 80, fontWeight: '200', color: '#F2F2FF', letterSpacing: -2 },
-  scoreLabel: { fontSize: 11, fontWeight: '600', color: '#84958a', letterSpacing: 1.5, textTransform: 'uppercase' },
-  readinessDetails: { marginTop: 16, alignItems: 'center' },
-  hrvText: { fontSize: 13, fontStyle: 'italic', color: '#84958a', marginBottom: 16 },
-  tagRow: { flexDirection: 'row', gap: 8 },
-  tag: { paddingHorizontal: 12, paddingVertical: 4, backgroundColor: 'rgba(168,200,255,0.2)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(168,200,255,0.2)' },
-  tagText: { color: '#a8c8ff', fontSize: 11, fontWeight: '600' },
+  scoreNumber: { fontSize: 56, lineHeight: 62, fontWeight: '200', color: '#F2F2FF', letterSpacing: -2 },
+  scoreLabel: { fontSize: 10, fontWeight: '600', color: '#84958a', letterSpacing: 1.5, textTransform: 'uppercase' },
+  readinessDetails: { marginTop: 8, alignItems: 'center' },
+  hrvText: { fontSize: 12, fontStyle: 'italic', color: '#84958a', marginBottom: 8 },
+  tagRow: { flexDirection: 'row', gap: 6 },
+  tag: { paddingHorizontal: 10, paddingVertical: 3, backgroundColor: 'rgba(168,200,255,0.2)', borderRadius: 20, borderWidth: 1, borderColor: 'rgba(168,200,255,0.2)' },
+  tagText: { color: '#a8c8ff', fontSize: 10, fontWeight: '600' },
   tagRhr: { backgroundColor: 'rgba(110,255,192,0.1)', borderColor: 'rgba(110,255,192,0.2)' },
-  tagTextRhr: { color: '#6effc0', fontSize: 11, fontWeight: '600' },
-  metricsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  tagTextRhr: { color: '#6effc0', fontSize: 10, fontWeight: '600' },
+  metricsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   metricCard: {
-    width: (width - 40 - 12) / 2, backgroundColor: '#141420',
-    borderRadius: 12, padding: 16, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+    width: (width - 36 - 8) / 2, backgroundColor: '#141420',
+    borderRadius: 10, padding: 11, gap: 7, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   metricContent: {},
-  metricValue: { fontSize: 36, lineHeight: 44, fontWeight: '300', color: '#F2F2FF', marginTop: 4 },
-  metricUnit: { fontSize: 14, fontWeight: 'normal' },
-  metricLabel: { fontSize: 11, fontWeight: '600', color: '#84958a', letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 2 },
-  metricSubtext: { fontSize: 11, color: '#84958a', marginTop: 2 },
+  metricValue: { fontSize: 26, lineHeight: 32, fontWeight: '300', color: '#F2F2FF', marginTop: 2 },
+  metricUnit: { fontSize: 12, fontWeight: 'normal' },
+  metricLabel: { fontSize: 10, fontWeight: '600', color: '#84958a', letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 2 },
+  metricSubtext: { fontSize: 10, color: '#84958a', marginTop: 2 },
   workoutCard: {
-    backgroundColor: '#141420', borderRadius: 12, padding: 16,
-    borderLeftWidth: 4, borderLeftColor: 'rgba(110,255,192,0.6)',
+    backgroundColor: '#141420', borderRadius: 10, padding: 14,
+    borderLeftWidth: 3, borderLeftColor: 'rgba(110,255,192,0.6)',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
-  workoutHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  workoutTitle: { fontSize: 16, fontWeight: '500', color: '#dbe5dd' },
-  chipRow: { gap: 8, paddingBottom: 4 },
-  chip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', gap: 8 },
-  chipLabel: { fontSize: 12, fontWeight: '500', color: '#dbe5dd' },
-  insightsSection: { gap: 16 },
+  workoutHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  workoutTitle: { fontSize: 15, fontWeight: '500', color: '#dbe5dd' },
+  chipRow: { gap: 6, paddingBottom: 4 },
+  chip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', gap: 6 },
+  chipLabel: { fontSize: 11, fontWeight: '500', color: '#dbe5dd' },
+  insightsSection: { gap: 14 },
   insightsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  insightsTitle: { fontSize: 11, fontWeight: '600', color: '#84958a', letterSpacing: 1.5, textTransform: 'uppercase' },
-  insightCard: { backgroundColor: '#141420', borderRadius: 12, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
-  insightIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(252,186,89,0.1)', justifyContent: 'center', alignItems: 'center' },
+  insightsTitle: { fontSize: 10, fontWeight: '600', color: '#84958a', letterSpacing: 1.5, textTransform: 'uppercase' },
+  insightCard: { backgroundColor: '#141420', borderRadius: 10, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  insightIcon: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(252,186,89,0.1)', justifyContent: 'center', alignItems: 'center' },
   insightContent: { flex: 1 },
-  insightLabel: { fontSize: 14, fontWeight: '500', color: '#dbe5dd' },
-  insightDesc: { fontSize: 12, color: '#84958a', marginTop: 2 },
-  bottomNav: {
-    position: 'absolute', bottom: 24, left: 20, right: 20,
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: 'rgba(20,20,32,0.8)', borderRadius: 40,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.6, shadowRadius: 16, elevation: 20,
-  },
-  navItem: { alignItems: 'center', justifyContent: 'center', flex: 1 },
-  navLabel: { fontSize: 10, fontWeight: '500', color: '#84958a', marginTop: 4 },
-  activeNavLabel: { color: '#6effc0' },
-  activeIcon: { textShadowColor: 'rgba(110,255,192,0.3)', textShadowOffset: { width: 0, height: 0 }, textShadowRadius: 8 },
-  errorText: { fontSize: 16, color: '#ffb4ab', textAlign: 'center', marginBottom: 12 },
-  retryText: { fontSize: 14, color: '#6effc0', textAlign: 'center', textDecorationLine: 'underline' },
+  insightLabel: { fontSize: 13, fontWeight: '500', color: '#dbe5dd' },
+  insightDesc: { fontSize: 11, color: '#84958a', marginTop: 2 },
+  errorText: { fontSize: 15, color: '#ffb4ab', textAlign: 'center', marginBottom: 12 },
+  retryText: { fontSize: 13, color: '#6effc0', textAlign: 'center', textDecorationLine: 'underline' },
 });
