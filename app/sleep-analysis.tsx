@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useHealthDashboard } from '../src/hooks/useHealthDashboard';
 import type { SleepData } from '../src/types/health';
@@ -72,7 +73,7 @@ export default function SleepAnalysisScreen() {
   const sleepDebtStr = sleepDebtHours > 0 ? `-${formatDuration(sleepDebtHours)}` : 'On track';
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* TOP BAR */}
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -206,10 +207,8 @@ export default function SleepAnalysisScreen() {
         </View>
       </ScrollView>
 
-      {/* Bottom Nav */}
-    <BottomNavigation />
-      
-    </View>
+      <BottomNavigation />
+    </SafeAreaView>
   );
 }
 

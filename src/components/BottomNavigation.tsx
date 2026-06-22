@@ -6,9 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TABS = [
   { icon: 'home',           label: 'Home',     route: '/dashboard' },
-  { icon: 'fitness-center', label: 'Workouts', route: '/workouts' },
+  { icon: 'spa',            label: 'Recovery', route: '/recovery' },
   { icon: 'bed',            label: 'Sleep',    route: '/sleep-analysis' },
-  { icon: 'timer',          label: 'Live',     route: '/live-workout' },
+  { icon: 'insights',       label: 'Training', route: '/training-load' },
+  { icon: 'favorite',       label: 'Metrics',  route: '/health-metrics' },
 ] as const;
 
 export default function BottomNavigation() {
