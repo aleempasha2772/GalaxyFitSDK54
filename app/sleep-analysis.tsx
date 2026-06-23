@@ -10,6 +10,7 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
+import Svg, { Circle as SvgCircle } from 'react-native-svg';
 import { useHealthDashboard } from '../src/hooks/useHealthDashboard';
 import type { SleepData } from '../src/types/health';
 import BottomNavigation from '../src/components/BottomNavigation';
@@ -94,10 +95,24 @@ export default function SleepAnalysisScreen() {
         {/* 1. Circular Sleep Score */}
         <View style={styles.gaugeSection}>
           <View style={styles.gaugeContainer}>
-            {/* Circular progress (simple filled circle + background) */}
-            <View style={styles.gaugeRing}>
-              <View style={[styles.gaugeFill, { width: `${sleepScore}%`, height: `${sleepScore}%` }]} />
-            </View>
+            <Svg width={160} height={160} viewBox="0 0 160 160">
+              <SvgCircle
+                cx={80} cy={80} r={66}
+                fill="transparent"
+                stroke="#141420"
+                strokeWidth={6}
+              />
+              <SvgCircle
+                cx={80} cy={80} r={66}
+                fill="transparent"
+                stroke="#6effc0"
+                strokeWidth={6}
+                strokeDasharray={`${2 * Math.PI * 66} ${2 * Math.PI * 66}`}
+                strokeDashoffset={2 * Math.PI * 66 * (1 - sleepScore / 100)}
+                strokeLinecap="round"
+                transform="rotate(-90 80 80)"
+              />
+            </Svg>
             <View style={styles.gaugeText}>
               <Text style={styles.scoreNumber}>{sleepScore}</Text>
               <Text style={styles.scoreLabel}>
@@ -252,17 +267,8 @@ const styles = StyleSheet.create({
   gaugeSection: { alignItems: 'center', marginTop: 8 },
   gaugeContainer: {
     width: 160, height: 160, justifyContent: 'center', alignItems: 'center',
-    borderRadius: 80, borderWidth: 6, borderColor: '#141420',
-    backgroundColor: '#0A0A0F',
   },
-  gaugeRing: {
-    position: 'absolute', width: '100%', height: '100%',
-  },
-  gaugeFill: {
-    position: 'absolute', bottom: 0, left: 0,
-    backgroundColor: '#6effc0', opacity: 0.3, borderRadius: 80,
-  },
-  gaugeText: { alignItems: 'center' },
+  gaugeText: { position: 'absolute', alignItems: 'center' },
   scoreNumber: { fontSize: 48, fontWeight: 'bold', color: '#F2F2FF' },
   scoreLabel: { fontSize: 11, fontWeight: '600', color: '#6effc0', letterSpacing: 2, textTransform: 'uppercase' },
 
@@ -301,8 +307,8 @@ const styles = StyleSheet.create({
   timelineLabel: { fontSize: 10, color: '#84958a' },
 
   section: { gap: 12 },
-  weekChart: { height: 100, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
-  barContainer: { flex: 1, marginHorizontal: 2, alignItems: 'center' },
+  weekChart: { height: 100, flexDirection: 'row', justifyContent: 'space-between' },
+  barContainer: { flex: 1, marginHorizontal: 2, alignItems: 'center', justifyContent: 'flex-end' },
   bar: { width: '70%', backgroundColor: '#141420', borderTopLeftRadius: 4, borderTopRightRadius: 4 },
   barToday: { backgroundColor: 'rgba(110,255,192,0.4)', borderColor: '#6effc0', borderWidth: 1 },
   weekLabels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 2 },

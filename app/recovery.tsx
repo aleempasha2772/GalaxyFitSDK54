@@ -72,9 +72,7 @@ export default function RecoveryScreen() {
                 strokeDasharray={`${ARC_LENGTH} ${CIRCUMFERENCE}`}
                 strokeDashoffset={0}
                 strokeLinecap="round"
-                rotation={150}
-                originX={120}
-                originY={120}
+                transform="rotate(150 120 120)"
               />
               {/* Progress arc */}
               <Circle
@@ -85,9 +83,7 @@ export default function RecoveryScreen() {
                 strokeDasharray={`${progressArc} ${CIRCUMFERENCE}`}
                 strokeDashoffset={0}
                 strokeLinecap="round"
-                rotation={150}
-                originX={120}
-                originY={120}
+                transform="rotate(150 120 120)"
               />
             </Svg>
             <View style={styles.gaugeInner}>
